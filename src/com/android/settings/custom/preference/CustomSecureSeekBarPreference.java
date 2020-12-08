@@ -18,6 +18,7 @@
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.provider.Settings;
 
 public class CustomSecureSeekBarPreference extends CustomSeekBarPreference {
 
@@ -34,5 +35,33 @@ public class CustomSecureSeekBarPreference extends CustomSeekBarPreference {
     public CustomSecureSeekBarPreference(Context context) {
         super(context, null);
         setPreferenceDataStore(new SecureSettingsStore(context.getContentResolver()));
+    }
+
+    private boolean isPersisted() {
+        return Settings.Secure.getString(getContext().getContentResolver(), getKey()) != null;
+    }
+
+    private boolean getBoolean(String key, boolean defaultValue) {
+        return Settings.Secure.getInt(getContext().getContentResolver(),
+                key, defaultValue ? 1 : 0) != 0;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        final boolean checked;
+        if (!restorePersistedValue || !isPersisted()) {
+            if (defaultValue == null) {
+                return;
+            }
+            checked = (boolean) defaultValue;
+            if (shouldPersist()) {
+                persistBoolean(checked);
+            }
+        } else {
+            // Note: the default is not used because to have got here
+            // isPersisted() must be true.
+            checked = getBoolean(getKey(), false /* not used */);
+        }
+        setChecked(checked);
     }
 }

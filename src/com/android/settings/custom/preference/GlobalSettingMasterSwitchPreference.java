@@ -18,6 +18,7 @@
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.provider.Settings;
 
 import com.android.settings.custom.preference.GlobalSettingsStore;
 
@@ -38,4 +39,31 @@ public class GlobalSettingMasterSwitchPreference extends MasterSwitchPreference 
         setPreferenceDataStore(new GlobalSettingsStore(context.getContentResolver()));
     }
 
+    private boolean isPersisted() {
+        return Settings.Global.getString(getContext().getContentResolver(), getKey()) != null;
+    }
+
+    private boolean getBoolean(String key, boolean defaultValue) {
+        return Settings.Global.getInt(getContext().getContentResolver(),
+                key, defaultValue ? 1 : 0) != 0;
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        final boolean checked;
+        if (!restorePersistedValue || !isPersisted()) {
+            if (defaultValue == null) {
+                return;
+            }
+            checked = (boolean) defaultValue;
+            if (shouldPersist()) {
+                persistBoolean(checked);
+            }
+        } else {
+            // Note: the default is not used because to have got here
+            // isPersisted() must be true.
+            checked = getBoolean(getKey(), false /* not used */);
+        }
+        setChecked(checked);
+    }
 }

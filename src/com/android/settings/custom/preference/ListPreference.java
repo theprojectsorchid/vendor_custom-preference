@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,8 +19,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
-public class ListPreference extends androidx.preference.ListPreference {
-    private boolean mAutoSummary = false;
+import android.provider.Settings;
+
+public class SecureSettingListPreference extends SelfRemovingListPreference {
 
     public ListPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -30,25 +31,23 @@ public class ListPreference extends androidx.preference.ListPreference {
         super(context, attrs);
     }
 
-    public ListPreference(Context context) {
-        super(context);
+    public int getIntValue(int defValue) {
+        return getValue() == null ? defValue : Integer.valueOf(getValue());
     }
 
     @Override
-    public void setValue(String value) {
-        super.setValue(value);
-        if (mAutoSummary || TextUtils.isEmpty(getSummary())) {
-            setSummary(getEntry(), true);
-        }
+    protected boolean isPersisted() {
+        return Settings.Secure.getString(getContext().getContentResolver(), getKey()) != null;
     }
 
     @Override
-    public void setSummary(CharSequence summary) {
-        setSummary(summary, false);
+    protected void putString(String key, String value) {
+        Settings.Secure.putString(getContext().getContentResolver(), key, value);
     }
 
-    private void setSummary(CharSequence summary, boolean autoSummary) {
-        mAutoSummary = autoSummary;
-        super.setSummary(summary);
+    @Override
+    protected String getString(String key, String defaultValue) {
+        String result = Settings.Secure.getString(getContext().getContentResolver(), key);
+        return result == null ? defaultValue : result;
     }
 }
