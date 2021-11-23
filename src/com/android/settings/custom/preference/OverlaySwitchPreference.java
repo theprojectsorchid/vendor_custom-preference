@@ -26,8 +26,6 @@ import android.os.ServiceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import androidx.preference.SwitchPreference;
-
 import java.lang.SecurityException;
 
 public class OverlaySwitchPreference extends SwitchPreference {
