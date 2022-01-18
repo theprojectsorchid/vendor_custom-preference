@@ -1,6 +1,6 @@
-/**
- * Copyright (C) 2014-2016 The CyanogenMod Project
- * Copyright (C) 2018 The LineageOS Project
+/*
+ * Copyright (C) 2015 The CyanogenMod project
+ * Copyright (C) 2017 AICP
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,34 @@
 package com.android.settings.custom.preference;
 
 import android.content.Context;
-import android.provider.Settings;
+import androidx.preference.SwitchPreference;
 import android.util.AttributeSet;
 
-public class GlobalSettingSwitchPreference extends SelfRemovingSwitchPreference {
+public class GlobalSettingSwitchPreference extends SwitchPreference {
 
     public GlobalSettingSwitchPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setPreferenceDataStore(new GlobalSettingsStore(context.getContentResolver()));
     }
 
     public GlobalSettingSwitchPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setPreferenceDataStore(new GlobalSettingsStore(context.getContentResolver()));
     }
 
     public GlobalSettingSwitchPreference(Context context) {
-        super(context, null);
+        super(context);
+        setPreferenceDataStore(new GlobalSettingsStore(context.getContentResolver()));
     }
 
     @Override
-    protected boolean isPersisted() {
-        return Settings.Global.getString(getContext().getContentResolver(), getKey()) != null;
-    }
-
-    @Override
-    protected void putBoolean(String key, boolean value) {
-        Settings.Global.putInt(getContext().getContentResolver(), key, value ? 1 : 0);
-    }
-
-    @Override
-    protected boolean getBoolean(String key, boolean defaultValue) {
-        return Settings.Global.getInt(getContext().getContentResolver(),
-                key, defaultValue ? 1 : 0) != 0;
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
+        // This is what default TwoStatePreference implementation is doing without respecting
+        // real default value:
+        //setChecked(restoreValue ? getPersistedBoolean(mChecked)
+        //        : (Boolean) defaultValue);
+        // Instead, we better do
+        setChecked(restoreValue ? getPersistedBoolean((Boolean) defaultValue)
+                : (Boolean) defaultValue);
     }
 }
