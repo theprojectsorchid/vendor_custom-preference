@@ -27,7 +27,13 @@
         <attr name="replacesKey" format="string" />
         <attr name="minSummaryLines" format="integer" />
     </declare-styleable>
-
+ <!-- Base attributes available to ProperSeekBarPreference. -->
+    <declare-styleable name="ProperSeekBarPreference">
+        <attr name="interval" format="integer" />
+        <attr name="showSign" format="boolean" />
+        <attr name="units" format="string|reference" />
+        <attr name="continuousUpdates" format="boolean" />
+    </declare-styleable>
     <!-- Base attributes available to OverlaySwitchPreference. -->
     <declare-styleable name="OverlaySwitchPreference">
         <attr name="dkey" format="string" />
