@@ -24,6 +24,7 @@
         <attr name="requiresProperty" format="string" />
         <attr name="requiresOwner" format="boolean" />
         <attr name="requiresAction" format="string" />
+        <attr name="requiresService" format="string" />
         <attr name="replacesKey" format="string" />
         <attr name="minSummaryLines" format="integer" />
     </declare-styleable>
@@ -33,8 +34,23 @@
         <attr name="dkey" format="string" />
     </declare-styleable>
 
+    <attr name="preferenceBackgroundColor" format="color" />
+
     <!-- Base attributes available to CustomSeekBarPreference. -->
     <declare-styleable name="CustomSeekBarPreference">
+        <attr name="interval" format="integer" />
+        <attr name="min" format="integer" />
+        <attr name="showSign" format="boolean" />
+        <attr name="continuousUpdates" format="boolean" />
+        <attr name="units" format="string|reference" />
+        <attr name="unitsLeft" format="string|reference" />
+        <attr name="unitsRight" format="string|reference" />
+        <attr name="defaultText" format="string|reference" />
+        <attr name="allowEditText" format="boolean" />
+    </declare-styleable>
+
+    <!-- Base attributes available to ProperSeekBarPreference. -->
+    <declare-styleable name="ProperSeekBarPreference">
         <attr name="interval" format="integer" />
         <attr name="showSign" format="boolean" />
         <attr name="units" format="string|reference" />
