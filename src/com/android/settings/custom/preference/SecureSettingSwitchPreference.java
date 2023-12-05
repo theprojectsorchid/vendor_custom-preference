@@ -1,6 +1,6 @@
-/**
- * Copyright (C) 2014-2016 The CyanogenMod Project
- * Copyright (C) 2018 The LineageOS Project
+/*
+ * Copyright (C) 2014 The CyanogenMod project
+ * Copyright (C) 2017 AICP
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,52 @@
 package com.android.settings.custom.preference;
 
 import android.content.Context;
-import android.provider.Settings;
+import androidx.preference.SwitchPreference;
 import android.util.AttributeSet;
+import android.provider.Settings;
 
-public class SecureSettingSwitchPreference extends SelfRemovingSwitchPreference {
+public class SecureSettingSwitchPreference extends SwitchPreference {
 
     public SecureSettingSwitchPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setPreferenceDataStore(new SecureSettingsStore(context.getContentResolver()));
     }
 
     public SecureSettingSwitchPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setPreferenceDataStore(new SecureSettingsStore(context.getContentResolver()));
     }
 
     public SecureSettingSwitchPreference(Context context) {
-        super(context, null);
+        super(context);
+        setPreferenceDataStore(new SecureSettingsStore(context.getContentResolver()));
     }
 
-    @Override
-    protected boolean isPersisted() {
+    private boolean isPersisted() {
         return Settings.Secure.getString(getContext().getContentResolver(), getKey()) != null;
     }
 
-    @Override
-    protected void putBoolean(String key, boolean value) {
-        Settings.Secure.putInt(getContext().getContentResolver(), key, value ? 1 : 0);
+    private boolean getBoolean(String key, boolean defaultValue) {
+        return Settings.Secure.getInt(getContext().getContentResolver(),
+                key, defaultValue ? 1 : 0) != 0;
     }
 
     @Override
-    protected boolean getBoolean(String key, boolean defaultValue) {
-        return Settings.Secure.getInt(getContext().getContentResolver(),
-                key, defaultValue ? 1 : 0) != 0;
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        final boolean checked;
+        if (!restorePersistedValue || !isPersisted()) {
+            if (defaultValue == null) {
+                return;
+            }
+            checked = (boolean) defaultValue;
+            if (shouldPersist()) {
+                persistBoolean(checked);
+            }
+        } else {
+            // Note: the default is not used because to have got here
+            // isPersisted() must be true.
+            checked = getBoolean(getKey(), false /* not used */);
+        }
+        setChecked(checked);
     }
 }
